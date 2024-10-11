@@ -36,6 +36,26 @@ mod hooks {
 
         fn offchain_worker(n: BlockNumberFor<T>) {
             log::info!("Kitties offchain_worker at block {:?}", n);
+            // Since off-chain workers are just part of the runtime code, they have direct access
+            // to the storage and other included pallets.
+            //
+            // We can easily import `frame_system` and retrieve a block hash of the parent block.
+            let parent_hash = <frame_system::Pallet<T>>::block_hash(n - 1u32.into());
+            log::debug!("Current block: {:?} (parent hash: {:?})", n, parent_hash);
+
+            // It's a good practice to keep `fn offchain_worker()` function minimal, and move most
+            // of the code to separate `impl` block.
+            // Here we call a helper function to calculate current average price.
+            // This function reads storage entries of the current state.
+            let average: Option<u32> = Self::average_price();
+            log::debug!("Current price: {:?}", average);
+
+            if Self::decide_to_send(n) {
+                // Using `send_signed_transaction` associated type we create and submit a transaction
+                if let Err(e) = Self::fetch_price_and_send_signed() {
+                    log::error!("Failed to fetch price: {:?}", e);
+                }
+            }
         }
 
         #[cfg(feature = "try-runtime")]

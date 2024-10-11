@@ -4,9 +4,10 @@ use frame_support::pallet_macros::pallet_section;
 /// This can later be imported into the pallet using [`import_section`].
 #[pallet_section]
 mod config {
+    use frame_system::offchain::AppCrypto;
 
     #[pallet::config]
-    pub trait Config: frame_system::Config {
+    pub trait Config: CreateSignedTransaction<Call<Self>> + frame_system::Config {
         /// The overarching runtime event type.
         type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
         /// A type representing the weights required by the dispatchables of this pallet.
@@ -18,5 +19,18 @@ mod config {
 
         #[pallet::constant]
         type BreedFee: Get<BalanceOf<Self>>;
+        // offchain worker
+
+        type AuthorityId: AppCrypto<Self::Public, Self::Signature>;
+
+        #[pallet::constant]
+        type MaxPrices: Get<u32>;
+        /// A grace period after we send transaction.
+        ///
+        /// To avoid sending too many transactions, we only attempt to send one
+        /// every `GRACE_PERIOD` blocks. We use Local Storage to coordinate
+        /// sending between distinct runs of this offchain worker.
+        #[pallet::constant]
+        type GracePeriod: Get<BlockNumberFor<Self>>;
     }
 }

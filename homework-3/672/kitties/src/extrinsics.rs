@@ -133,5 +133,15 @@ mod dispatches {
 
             Ok(())
         }
+
+        #[pallet::call_index(5)]
+        #[pallet::weight({0})]
+        pub fn submit_price(origin: OriginFor<T>, price: u32) -> DispatchResultWithPostInfo {
+            // Retrieve sender of the transaction.
+            let who = ensure_signed(origin)?;
+            // Add the price to the on-chain list.
+            Self::add_price(Some(who), price);
+            Ok(().into())
+        }
     }
 }

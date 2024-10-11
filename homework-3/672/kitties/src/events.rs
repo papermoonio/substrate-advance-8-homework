@@ -25,5 +25,10 @@ mod events {
             index: KittyIndex,
             until: BlockNumberFor<T>,
         },
+        /// Event generated when new price is accepted to contribute to the average.
+        NewPrice {
+            price: u32,
+            maybe_who: Option<T::AccountId>,
+        },
     }
 }

@@ -2,14 +2,15 @@ use crate as pallet_kitties;
 use frame_support::traits::Hooks;
 use frame_support::{
     derive_impl,
-    traits::{ConstU128, ConstU16, ConstU64},
+    traits::{ConstU128, ConstU16, ConstU32, ConstU64},
     weights::Weight,
 };
 use pallet_balances;
 // use serde::de;
-use sp_core::H256;
+use sp_core::{sr25519::Signature, H256};
 use sp_runtime::{
-    traits::{BlakeTwo256, IdentityLookup},
+    testing::TestXt,
+    traits::{BlakeTwo256, Extrinsic as ExtrinsicT, IdentifyAccount, IdentityLookup, Verify},
     BuildStorage,
 };
 
@@ -38,7 +39,7 @@ impl frame_system::Config for Test {
     type Nonce = u64;
     type Hash = H256;
     type Hashing = BlakeTwo256;
-    type AccountId = u64;
+    type AccountId = sp_core::sr25519::Public;
     type Lookup = IdentityLookup<Self::AccountId>;
     type Block = Block;
     type RuntimeEvent = RuntimeEvent;
@@ -54,6 +55,36 @@ impl frame_system::Config for Test {
     type MaxConsumers = frame_support::traits::ConstU32<16>;
 }
 
+pub(crate) type Extrinsic = TestXt<RuntimeCall, ()>;
+type AccountId = <<Signature as Verify>::Signer as IdentifyAccount>::AccountId;
+
+impl frame_system::offchain::SigningTypes for Test {
+    type Public = <Signature as Verify>::Signer;
+    type Signature = Signature;
+}
+
+impl<LocalCall> frame_system::offchain::SendTransactionTypes<LocalCall> for Test
+where
+    RuntimeCall: From<LocalCall>,
+{
+    type OverarchingCall = RuntimeCall;
+    type Extrinsic = Extrinsic;
+}
+
+impl<LocalCall> frame_system::offchain::CreateSignedTransaction<LocalCall> for Test
+where
+    RuntimeCall: From<LocalCall>,
+{
+    fn create_transaction<C: frame_system::offchain::AppCrypto<Self::Public, Self::Signature>>(
+        call: RuntimeCall,
+        _public: <Signature as Verify>::Signer,
+        _account: AccountId,
+        nonce: u64,
+    ) -> Option<(RuntimeCall, <Extrinsic as ExtrinsicT>::SignaturePayload)> {
+        Some((call, (nonce, ())))
+    }
+}
+
 #[derive_impl(pallet_balances::config_preludes::TestDefaultConfig)]
 impl pallet_balances::Config for Test {
     type Balance = Balance;
@@ -62,11 +93,14 @@ impl pallet_balances::Config for Test {
 }
 
 impl pallet_kitties::Config for Test {
+    type AuthorityId = pallet_kitties::TestAuthId;
     type RuntimeEvent = RuntimeEvent;
     type WeightInfo = ();
     type Randomness = Random;
     type Currency = Balances;
     type BreedFee = ConstU128<1>;
+    type GracePeriod = ConstU64<5>;
+    type MaxPrices = ConstU32<64>;
 }
 
 impl pallet_insecure_randomness_collective_flip::Config for Test {}

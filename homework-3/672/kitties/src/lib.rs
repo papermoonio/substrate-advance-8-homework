@@ -10,6 +10,7 @@ mod tests;
 
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
+
 pub mod weights;
 pub use weights::*;
 
@@ -20,7 +21,8 @@ mod extrinsics;
 mod genesis;
 mod hooks;
 mod impls;
-mod offchain;
+pub mod offchain;
+pub use offchain::*;
 
 /// Import all sections from different files.
 #[import_section(extrinsics::dispatches)]
@@ -84,5 +86,5 @@ pub mod pallet {
         StorageMap<_, _, KittyIndex, Vec<(T::AccountId, BalanceOf<T>)>>;
 
     #[pallet::storage]
-    pub type Prices<T: Config> = StorageValue<_, Price, ValueQuery>;
+    pub type Prices<T: Config> = StorageValue<_, BoundedVec<Price, T::MaxPrices>, ValueQuery>;
 }
