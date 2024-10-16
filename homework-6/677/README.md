@@ -26,3 +26,7 @@
 6. 當完成修改ink! 項目後，可以build
 * cargo contract build
 ![alt text](https://github.com/MartinYeung5/substrate-advance-8-homework/blob/main/homework-6/677/5.png?raw=true)
+
+7. 進行項目 test
+* cargo test
+![alt text](https://github.com/MartinYeung5/substrate-advance-8-homework/blob/main/homework-6/677/6.png?raw=true)
