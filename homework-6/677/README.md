@@ -23,4 +23,5 @@
 * rustup update
 ![alt text](https://github.com/MartinYeung5/substrate-advance-8-homework/blob/main/homework-6/677/4.png?raw=true)
 
+6. 當完成修改ink! 項目後，可以build
 * cargo contract build
