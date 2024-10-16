@@ -14,3 +14,4 @@
 * cargo contract new ink_project_20241015
 ![alt text](https://github.com/MartinYeung5/substrate-advance-8-homework/blob/main/homework-6/677/2.png?raw=true)
 
+4. 檢查 rust 版本
