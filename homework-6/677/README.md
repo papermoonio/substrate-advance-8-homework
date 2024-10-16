@@ -18,3 +18,5 @@
 * 重點，不要降低 rust 版本，用 1.81.0 就可以
 * rustup show
 ![alt text](https://github.com/MartinYeung5/substrate-advance-8-homework/blob/main/homework-6/677/3.png?raw=true)
+
+5. 
