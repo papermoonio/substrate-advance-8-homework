@@ -28,21 +28,27 @@ mod impls;
 #[import_section(config::config)]
 #[import_section(hooks::hooks)]
 #[import_section(impls::impls)]
-#[import_section(genesis::genesis)] //初始化
+#[import_section(genesis::genesis)]
 /// Set the pallet at dev mode for quick PoC.
+// (dev_mode)
 #[frame_support::pallet()]
 pub mod pallet {
     use super::*;
     use frame_support::pallet_prelude::*;
-    use frame_support::traits::{Currency, Randomness, ReservableCurrency};
+    use frame_support::traits::{Currency, ExistenceRequirement, Randomness, ReservableCurrency};
     use frame_system::pallet_prelude::*;
     use serde::{Deserialize, Serialize};
+    use sp_io::hashing::blake2_128;
+    use sp_runtime::traits::Bounded;
     use sp_std::prelude::*;
     use sp_weights::WeightMeter;
 
     pub type BalanceOf<T> =
         <<T as Config>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
-    #[derive(Encode, Decode, Clone, Default, TypeInfo, Serialize, Deserialize, MaxEncodedLen)]
+
+    #[derive(
+        Encode, Decode, Clone, Default, TypeInfo, Serialize, Deserialize, PartialEq, Debug,
+    )]
     pub struct Kitty(pub [u8; 16]);
 
     #[pallet::pallet]
@@ -58,11 +64,10 @@ pub mod pallet {
     pub type KittyOwner<T: Config> = StorageMap<_, Blake2_128Concat, u32, T::AccountId>;
 
     #[pallet::storage]
-    pub type KittyOnSale<T: Config> =
-        StorageMap<_, Blake2_128Concat, u32, (BlockNumberFor<T>, BalanceOf<T>)>;
+    pub type KittyOnSale<T: Config> = StorageMap<_, Blake2_128Concat, u32, BlockNumberFor<T>>;
 
     // bid price for each kitty,
     #[pallet::storage]
     pub type KittiesBid<T: Config> =
-        StorageMap<_, Blake2_128Concat, u32, (T::AccountId, BalanceOf<T>)>;
+        StorageMap<_, Blake2_128Concat, u32, Vec<(T::AccountId, BalanceOf<T>)>>;
 }

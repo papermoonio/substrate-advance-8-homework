@@ -34,10 +34,10 @@ mod benches {
 
         let claim = BoundedVec::try_from(vec![0; b as usize]).unwrap();
 
-        // Proofs::<T>::create_claim(
-        //   RawOrigin::Signed(caller.clone()).into(),
-        //   claim.clone()
-        // )
+        Proofs::<T>::create_claim(
+            RawOrigin::Signed(caller.clone()).into(),
+            claim.clone()
+        )
 
         Proofs::<T>::insert(
             &claim,
